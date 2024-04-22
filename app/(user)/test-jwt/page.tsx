@@ -7,7 +7,7 @@ export default function TestJWT() {
     const [unAuthorized, setUnAuthorized] = useState(false);
 
     // handle login
-    const handleLogin = async () => { 
+    const handleLogin = async () => {
         const email = "sangsokea109@gmail.com";
         const password = "admin@1234";
 
@@ -28,14 +28,14 @@ export default function TestJWT() {
         });
 
     }
-    
+
 
     // handle patial update
-    const handlePartialUpdate = async () => { 
+    const handlePartialUpdate = async () => {
         const body = {
             name: "Update product by ID",
         }
-        
+
 
         // fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_URL}/api/products/${499}/`, {
         //     method: "PATCH",
@@ -70,12 +70,12 @@ export default function TestJWT() {
             handleRefreshToken();
         }
         const data = await res.json();
-        console.log("Response When Update",data);
+        console.log("Response When Update", data);
     }
 
 
     // handle refresh token
-    const handleRefreshToken = async () => { 
+    const handleRefreshToken = async () => {
         fetch(process.env.NEXT_PUBLIC_API_URL + "/refresh", {
             method: "POST",
             credentials: "include",
@@ -83,25 +83,48 @@ export default function TestJWT() {
                 refreshToken: ""
             }),
         }).then(response => response.json()).then((data) => {
-            // console.log("Data from refresh token: ", data);
+            console.log("Data from refresh token: ", data);
             setAccessToken(data.accessToken);
         }).catch((error) => {
             console.log(error);
         });
     }
 
-      
+    // handle logout
+    const handleLogout = async () => {
+        fetch(process.env.NEXT_PUBLIC_API_URL + "/logout", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                refreshToken: ""
+            })
+        }).then(response => {
+            if (response.ok) {
+                console.log("Logout successful!");
+                setAccessToken(""); // Clear access token state
+            } else {
+                console.error("Logout failed:", response.statusText);
+            }
+        })
+            .catch(error => {
+                console.error("Logout error:", error);
+            });
+    }
+
 
     return (
         <main className='h-screen grid place-content-center'>
-            <h1 className='text-4xl'>Test Handle Login</h1> 
+            <h1 className='text-4xl'>Test Handle Login</h1>
             <button onClick={handleLogin} className='p-3 bg-blue-600 rounded-xl my-2 text-slate-50'>Login</button>
             <button onClick={handlePartialUpdate} className='p-3 bg-green-600 rounded-xl my-2 text-slate-50'>Patial Update</button>
             {
                 unAuthorized && (
-                    <button onClick={handleRefreshToken} className='p-3 bg-red-600 rounded-xl my-2 text-slate-50'>Refresh Token</button>
+                    <button onClick={handleRefreshToken} className='p-3 bg-red-200 rounded-xl my-2 text-slate-50'>Refresh Token</button>
                 )
             }
+            <button onClick={handleLogout} className='p-3 bg-orange-400 rounded-xl my-2 text-slate-50'>Log Out</button>
         </main>
     )
 }
